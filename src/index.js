@@ -13,9 +13,10 @@ function getData() {
   })
 };
 
-const getFullUserName=(userInfo) => {
-  const {name:{first, last}}=userInfo;
-  return `${first} ${last} `
+function getName(userInfo){
+  const {name:{first, last}}=userInfo // j'ai accès aux infos contenues dans setUserInfos
+  
+  return `${first} ${last}`
 }
 
 export default function App(){
@@ -26,7 +27,7 @@ export default function App(){
   useEffect(()=>{
     getData().then(randomData => { // getData me retourne une promesse, que je vais stocker dans la constante random data. Ici getData().then(randomData() est équivalent à const randomData=await getData.
       setrandomData(JSON.stringify(randomData || 'No user data'))// et avec random data tu me setrandomData avec cette nouvelle valeur stockée.
-      setUserInfos(randomData.results);// Au moment ou je fais le set, je remplace la valeur userInfos.
+      setUserInfos(randomData.results)
     })
   },[]);
 
@@ -43,21 +44,25 @@ export default function App(){
       <button > 
         Fetch data
       </button>
-      {
-        userInfos.map((userInfo) => (
-        <>
-          <p>
-            {getFullUserName(userInfo)}
-          </p>
-          <img src={userInfo.picture.thumbnail} alt="" />
-          </>
-        ))
-        }
+
       <p>
 
       <pre>
         {randomData}
       </pre>
+      </p>
+      <p>
+
+      {
+        userInfos.map((userInfo) => (
+        <>
+          <p>
+            {getName(userInfo)}
+          </p>
+          <img src={userInfo.picture.thumbnail} alt="" />
+          </>
+        ))
+        }
       </p>
     </div>
   )
