@@ -1,0 +1,102 @@
+import React from 'react'
+import reactDOM from 'react-dom'
+import {useState, useEffect} from 'react'
+import axios from 'axios'
+
+function getData(pageNumber=1) {
+  
+  return axios
+  .get(`https://randomuser.me/api?page=${pageNumber}`)
+  .then  (({data})=>{
+    return (data)
+  })
+};
+
+function getName(user){
+  console.log('1');
+  console.log(user)
+
+  const {name:{first, last}}=user // j'ai accès aux infos contenues dans setUserInfos, descturé permet de simlifier userInfo.name.last
+  console.log('userinfo')
+  console.log(user)
+  return `${first} ${last}`
+}
+
+export default function App(){
+  const [counter, setcounter]=useState(0)
+  const [randomData, setrandomData]=useState('re');// me fournit toutes les infos d'un user
+  const [userInfos, setUserInfos]=useState([]);//au premier tour de boucle contient les infos d'un user, au 2ème, 
+  //append les infos de l'autre user
+  const [nextPageNumber, setNextPageNumber]=useState(1)
+  
+const fetchNextUser=()=>{
+  getData(nextPageNumber).then(randomData => { // getData me retourne une promesse, que je vais stocker dans la constante random data. Ici getData().then(randomData() est équivalent à const randomData=await getData.
+    //setrandomData(JSON.stringify(randomData || 'No user data'))// et avec random data tu me setrandomData avec cette nouvelle valeur stockée.
+    console.log('userinfos');
+    console.log(userInfos)
+    console.log('randomdata.results');
+    console.log(randomData.results)
+
+    const newUserInfos=[
+      ...userInfos,//le tableau qui grandit
+      ...randomData.results// le resultat de l'api individuel
+    ]
+    console.log('newUserInfos');
+    console.log(newUserInfos);
+    console.log('-------------');
+
+    setUserInfos(newUserInfos)// je mets à jour mon user infos avec la combinaison des resultats et des userinfos
+    setNextPageNumber(randomData.info.page+1)
+  })
+
+}
+  useEffect(()=>{
+    fetchNextUser();
+  },[]);
+  console.log('2');
+  useEffect(() => {
+    document.title = `You clicked ${counter} times`;
+  });
+  return (
+    <div>
+      <p>
+        {counter}
+      </p>
+
+      <button onClick={()=>{setcounter(counter+1)}}>
+        Increase
+      </button>
+      <button > 
+        Fetch data
+      </button>
+      <button onClick={()=>{(fetchNextUser())}}> 
+        Fetch Next users
+      </button>
+
+      <p>
+
+      <pre>
+        {randomData}
+      </pre>
+      </p>
+      <p>
+
+      {
+        userInfos.map((userInfo) => (// je boucle ici dans tous les objets de userinfos et 
+        <>
+          <p>
+            {getName(userInfo)}
+          </p>
+          <img src={userInfo.picture.thumbnail} alt="" />
+          </>
+        ))
+        }
+      </p>
+    </div>
+  )
+}
+// si je veux faire apparaître dans le click
+// onClick={()=>{getData().then(randomData => {setrandomData(randomData)});}}
+//          ()=>{getData().then(randomData => {setrandomData(randomData)})
+
+reactDOM.render(<App />, document.getElementById('root'))
